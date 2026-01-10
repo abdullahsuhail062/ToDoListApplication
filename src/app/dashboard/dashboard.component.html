@@ -1,0 +1,61 @@
+<div class="bg-cover bg-center bg-no-repeat w-screen h-screen overflow-hidden" style="background-image: url('/assets/bg-image.jpg');">
+  <mat-toolbar class="flex justify-between items-center h-14 bg-blue-800 text-white">
+    <span class="text-xl font-bold ml-2">User registeration app</span>
+    <div class="flex-grow"></div>
+    <div class="flex items-center">
+      <button class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg text-sm mx-4" (click)="navigateToDoList()">ToDoList</button>
+      <button class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg text-sm mx-4" routerLink="/settings">Settings</button>
+      <button mat-icon-button (click)="toggleFavoriteState()">
+        <mat-icon [ngClass]="{ 'text-red-500': isFavorite, 'text-black': !isFavorite }">
+          {{ isFavorite ? 'favorite' : 'favorite_border' }}
+        </mat-icon>
+      </button>
+      <button mat-icon-button class="mr-6" (click)="toggleShareMenu($event)">
+        <mat-icon>share</mat-icon>
+      </button>
+      <button mat-icon-button class="bg-green-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold text-base mr-2" (click)="openProfileDialog()">
+        <span class="text-base">{{ profileInitial }}</span>
+      </button>
+    </div>
+  </mat-toolbar>
+
+  <div *ngIf="showWelcomeMessage" class="bg-blue-100 border border-blue-200 text-blue-700 px-4 py-3 rounded relative mb-4 text-center">
+    <h2>Welcome to the Dashboard!</h2>
+    <p>We're glad to have you here.</p>
+  </div>
+
+  <div *ngIf="!isOnline" class="bg-red-100 border border-red-200 text-red-700 px-4 py-3 rounded relative w-full top-0 z-50 text-center font-bold">
+    ⚠️ No Internet Connection. Some features may not work.
+  </div>
+
+  <div *ngIf="showShareMenu" class="absolute right-0 mt-2 w-48 bg-blue-600 rounded-md shadow-lg p-2 z-10 transition-transform" [class.translate-x-full]="!showShareMenu">
+    <button (click)="shareVia('facebook')"><img src="/assets/facebook.png" alt="facebook" class="w-12 h-8"></button>
+    <button (click)="shareVia('whatsapp')"><img src="/assets/whatsapp.png" alt="whatsapp" class="w-12 h-8"></button>
+    <button (click)="copyLink()"><img src="/assets/copy.png" alt="copyLink" class="w-12 h-8"></button>
+  </div>
+
+  <div *ngIf="isUpdateLoading" class="flex justify-center items-center h-full">
+    <mat-progress-spinner color="primary" mode="indeterminate" diameter="40"></mat-progress-spinner>
+  </div>
+
+  <div *ngIf="hasDataFetched" class="flex flex-col items-start h-screen bg-transparent rounded-3xl shadow-lg p-5 w-1/2 max-w-md mx-auto">
+    <h1 class="text-white text-lg font-bold mb-4">Weather update:</h1>
+    <div class="flex items-center gap-2 mb-4">
+      <input matInput [(ngModel)]="inputValue" class="bg-white/50 border-2 border-gray-300 rounded-lg p-2 w-full focus:border-green-400" placeholder="Enter the city name">
+      <button mat-raised-button class="bg-green-400 hover:bg-green-500 text-white font-bold py-2 px-4 rounded-lg" (click)="search()">Search</button>
+    </div>
+    <p class="text-red-500 text-xs" *ngIf="isCityNameCorrect">{{error}}</p>
+
+    <div class="text-white font-bold">
+      <p>Location: {{ city }}, {{ region }}, {{ country }}</p>
+      <p>Last updated time: {{ update }}</p>
+      <div class="flex items-center">
+        <p>Weather update: temp: {{ temp }}, Cloud: {{ cloud }}</p>
+      </div>
+      <div class="flex items-center">
+        <p>Weather condition: {{ weatherCondition }}</p>
+        <img [src]="weatherIcon" alt="Weather condition" class="w-12 h-12">
+      </div>
+    </div>
+  </div>
+</div>

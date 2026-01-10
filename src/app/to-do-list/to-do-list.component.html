@@ -1,0 +1,92 @@
+<div class="wrapper">
+<div *ngIf="isLoading" class="spinner">
+  <p>Tasks list loading...</p>
+</div>
+<div *ngIf="isTaskExist" class="messageToDisplay">
+  <p>No task found...</p>
+</div>
+   <div class="toolbar-container">
+      <mat-toolbar color="primary">
+        <span class="title"> ToDoList Section</span>
+        <span class="spacer"></span>
+        <button ma-raised-button class="navigate" (click)="navigateToHome()">Dashboard</button>
+        <button mat-raised-button class="create-list-btn" (click)="openDialog(dialogTemplate)">
+          Create new List
+        </button>
+      </mat-toolbar>
+      </div>
+    
+      <div class="content">
+       
+        <mat-list>
+          <mat-list-item *ngFor="let item of items; let i = index">
+            <div *ngIf="!item.isEditing">
+              <div class="task-container">
+             <div class="task-title"><span class="date">{{item.date}}:  </span> <span class="task-name">{{item.title}}</span><br>
+              <span class="time">{{item.time}}:  </span><span class="task-description">{{ item.description }}</span></div>
+             <div class="task-actions"> <button class="edit-btn" mat-button color="primary" (click)="editItem(i)">Edit</button>
+              <button class="delete-btn" mat-button color="warn" (click)="deleteItem(dialogTemplateDeletion)">Delete</button>
+              <button class="share-btn" mat-button color="accent" (click)="openShareDialog(item.title)">Share</button>
+              <input type="checkbox" [checked]="item.completed" (change)="onTaskChange($event,item.title,item)" />
+            </div>
+            <div class="confirm-deletion-dialog">
+              <ng-template #dialogTemplateDeletion>
+                <h2 mat-dialog-title>Are you sure you want to delete tasks?</h2>
+                <mat-dialog-content class="container">
+                       <div class="btn"><button class="deleteBtn" mat-raised-button (click)="deleteAccount(i,item.title,dialogTemplateDeletion)" >Delete task</button>
+                      <button class="cancelBtn" mat-raised-button (click)="cancelDeletion(dialogTemplateDeletion)">Cancel</button></div>
+            </mat-dialog-content>
+            </ng-template>
+            </div>
+            </div>
+            </div>
+            <div class="edit-container" *ngIf="item.isEditing">
+              
+                <input class="title-input" matInput type="text" [(ngModel)]="item.title" placeholder="Edit title" />
+                <input class="description-input" matInput type="text" [(ngModel)]="item.description"  placeholder="Edit description" />
+              <button class="save-btn" mat-raised-button color="primary" (click)="saveItem(i,item.title,item.description)">Save</button>
+              <button class="cancel-btn" mat-raised-button color="warn" (click)="cancelEdit(i)">Cancel</button>
+            
+            </div>
+          </mat-list-item>
+        </mat-list>
+        
+      </div>
+   
+
+    
+  
+
+
+  <div class="dialog">
+    <ng-template #dialogTemplate>
+      <h2 mat-dialog-title>Create List</h2>
+      <div *ngIf="checkingTitleAvailability" class="titleAvailability">Checking title name availability...</div>
+      <div *ngIf="titleToBeCreated" class="titleToBeCreated">
+        Great! this title name is available
+      </div>
+      <div *ngIf="titleErrorChecking" class="titleError">
+        {{titleError}}
+      
+      </div>
+
+      <mat-dialog-content class="container">
+             <div class="input-container"><input class="input-title" (blur)="onBlur()" (focus)="onFocus()"
+              [(ngModel)]="taskTitleInput" (input)="createTaskTittle()" placeholder="Enter task title..."/>
+              <input class="input-description" [(ngModel)]="taskDescriptionInput" (input)="createTaskDescription()" placeholder="Enter task description..."/></div> 
+
+          <button mat-raised-button class="btn"
+          color="primary"
+          [disabled]="isDisabled" 
+          (click)="onCreateList()" [ngClass]="{ 'active-button': isActive}">
+          Create task list 
+        </button>
+      
+      
+      </mat-dialog-content>
+      </ng-template>
+   
+
+    </div>
+
+

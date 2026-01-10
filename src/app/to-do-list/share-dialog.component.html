@@ -1,0 +1,11 @@
+<h2 mat-dialog-title>Share List</h2>
+<mat-dialog-content>
+  <p>Enter the email of the user you want to share this list with.</p>
+  <mat-form-field>
+    <input matInput [(ngModel)]="email" placeholder="Email">
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">Cancel</button>
+  <button mat-button [mat-dialog-close]="email" cdkFocusInitial>Share</button>
+</mat-dialog-actions>
