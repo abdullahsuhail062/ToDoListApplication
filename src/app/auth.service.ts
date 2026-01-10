@@ -1,5 +1,7 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Injectable, signal, computed, PLATFORM_ID, inject } from '@angular/core';
 import { Router } from '@angular/router';
+
 
 @Injectable({
   providedIn: 'root'
@@ -8,10 +10,20 @@ export class AuthService {
 
   private readonly TOKEN_KEY = 'authToken';
   private readonly TASK_ID = 'taskId';
-
+  private isBrowser: boolean = isPlatformBrowser(inject(PLATFORM_ID))
+ 
+  
   // Signals for reactive state
-  private tokenSignal = signal<string | null>(localStorage.getItem(this.TOKEN_KEY));
-  private taskIdSignal = signal<string | null>(localStorage.getItem(this.TASK_ID));
+  private tokenSignal = signal<string | null>(null);
+  private taskIdSignal = signal<string | null>(null);
+
+  constructor(private router: Router) {
+    if (this.isBrowser) {
+      this.tokenSignal.set(localStorage.getItem(this.TOKEN_KEY));
+      this.taskIdSignal.set(localStorage.getItem(this.TASK_ID));
+    }
+  }
+  
 
   // Computed signal to check login status
   readonly isLoggedIn = computed(() => {
@@ -19,12 +31,14 @@ export class AuthService {
     return token != null && !this.isTokenExpired(token);
   });
 
-  constructor(private router: Router) {}
 
   /** Save JWT token and update signal */
   saveToken(token: string) {
-    localStorage.setItem(this.TOKEN_KEY, token);
+    if (this.isBrowser) {
+      localStorage.setItem(this.TOKEN_KEY, token);
     this.tokenSignal.set(token); // update reactive signal
+    }
+    
   }
 
   /** Get token value */
@@ -34,8 +48,11 @@ export class AuthService {
 
   /** Delete token */
   deleteToken() {
-    localStorage.removeItem(this.TOKEN_KEY);
+    if (this.isBrowser) {
+       localStorage.removeItem(this.TOKEN_KEY);
     this.tokenSignal.set(null);
+    }
+   
   }
 
   /** Logout user */
@@ -60,13 +77,19 @@ export class AuthService {
 
   /** Task ID reactive methods */
   storeTaskId(taskId: string) {
-    localStorage.setItem(this.TASK_ID, taskId);
+    if (this.isBrowser)  {
+      localStorage.setItem(this.TASK_ID, taskId);
     this.taskIdSignal.set(taskId);
+    }
+    
   }
 
   deleteTask() {
-    localStorage.removeItem(this.TASK_ID);
+    if (this.isBrowser) {
+      localStorage.removeItem(this.TASK_ID);
     this.taskIdSignal.set(null);
+    }
+    
   }
 
   getTaskId(): string | null {
