@@ -1,5 +1,5 @@
 import { NgClass, NgFor, NgIf } from '@angular/common';
-import { Component,NgZone, OnInit, TemplateRef } from '@angular/core';
+import { Component, OnInit, TemplateRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatDialog, MatDialogContent } from '@angular/material/dialog';
  import{MatToolbarModule} from '@angular/material/toolbar'
@@ -194,9 +194,9 @@ isTaskExist: boolean= false
      }
      onTaskChange(event:Event,title: string,item:any){
       const checked = (event.target as HTMLInputElement).checked;
-     const completed= item.isChecked = checked
+      item.completed = checked;
       const taskTitle = title      
-      this.apiService.taskCompeletion(completed,taskTitle).subscribe({next:(data)=>{
+      this.apiService.taskCompeletion(item.completed,taskTitle).subscribe({next:(data)=>{
       
       },error:(error)=>{this.handleError(error)}})
      }
@@ -299,7 +299,19 @@ isTaskExist: boolean= false
       }
     });
   }
+
+  clearCompletedTasks(): void {
+    const completedTaskTitles = this.items.filter(item => item.completed).map(item => item.title);
+    if (completedTaskTitles.length === 0) {
+      return;
+    }
+
+    this.apiService.deleteCompletedTasks(completedTaskTitles).subscribe({
+      next: () => {
+        this.items = this.items.filter(item => !item.completed);
+        this.isTaskExistStatus();
+      },
+      error: (error) => this.handleError(error)
+    });
+  }
 }
-
-
-

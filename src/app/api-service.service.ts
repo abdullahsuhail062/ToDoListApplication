@@ -124,7 +124,13 @@ shareTaskList(title: string, email: string): Observable<any> {
   return this.http.post(`${this.apiUrl}/api/shareTaskList`, { title, email }, { headers: { 'Authorization': `Bearer ${token}` } });
 }
 
-  
+  deleteCompletedTasks(taskTitles: string[]): Observable<any> {
+    const token = this.authService.getToken();
+    return this.http.delete(`${this.apiUrl}/api/deleteCompletedTasks`, { 
+      headers: { 'Authorization': `Bearer ${token}` },
+      body: { titles: taskTitles } 
+    });
+  }
 }
   
 

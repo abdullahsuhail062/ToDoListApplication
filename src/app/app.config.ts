@@ -1,5 +1,5 @@
 
-import { ApplicationConfig, provideZoneChangeDetection, isDevMode, ErrorHandler, inject } from '@angular/core';
+import { ApplicationConfig, provideZonelessChangeDetection, isDevMode, ErrorHandler, inject } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideClientHydration } from '@angular/platform-browser';
@@ -10,7 +10,7 @@ import { GlobalErrorHandler } from './global-error-handler';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideZonelessChangeDetection(),
     provideRouter(routes),
     provideClientHydration(),
     provideHttpClient(withFetch()),
