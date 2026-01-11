@@ -1,27 +1,21 @@
-import { Component } from '@angular/core';
-import { Inject } from '@angular/core';
-import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef, MatDialog } from '@angular/material/dialog';
-import { MatButtonModule } from '@angular/material/button';
-
-
+import { Component, EventEmitter, Output } from '@angular/core';
 
 @Component({
   selector: 'app-delete-account-dialog',
   standalone: true,
-  imports: [MatDialogModule, MatButtonModule],
+  imports: [], // No Material modules
   templateUrl: './delete-account-dialog.component.html',
-  styleUrl: './delete-account-dialog.component.scss'
+  styleUrl: './delete-account-dialog.component.scss' // This will be empty or removed later
 })
 export class DeleteAccountDialogComponent {
+  @Output() deleteConfirmed = new EventEmitter<void>();
+  @Output() cancelled = new EventEmitter<void>();
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any, public dialogRef: MatDialogRef<DeleteAccountDialogComponent>){}
-
-  confirmDelete(){
-    this.data.onConfirmDelete()
+  confirmDelete(): void {
+    this.deleteConfirmed.emit();
   }
 
-  closeAll(){
-    this.data.onCloseAll()
+  closeAll(): void {
+    this.cancelled.emit();
   }
-
 }

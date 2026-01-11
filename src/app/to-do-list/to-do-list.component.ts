@@ -1,36 +1,21 @@
 import { NgClass, NgFor, NgIf } from '@angular/common';
 import { Component, OnInit, TemplateRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatDialog, MatDialogContent, MatDialogModule } from '@angular/material/dialog';
- import{MatToolbarModule} from '@angular/material/toolbar'
 import { ApiService } from '../api-service.service';
-import { MatList, MatListItem} from '@angular/material/list';
 import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { ShareDialogComponent } from './share-dialog.component';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
   selector: 'app-to-do-list',
   standalone: true,
   imports: [
     NgIf,
-    MatToolbarModule,
-    MatDialogContent,
     FormsModule,
     NgClass,
     NgFor,
-    MatListItem,
-    MatList,
-    MatButtonModule,
-    MatIconModule,
-    MatDialogModule,
-    MatInputModule,
-    MatCheckboxModule
+    ShareDialogComponent // Import the standalone ShareDialogComponent
   ],
   templateUrl: './to-do-list.component.html',
   styleUrl: './to-do-list.component.scss',
@@ -52,7 +37,6 @@ taskDescriptionInput: string = ''
 isDeactive: boolean = true
 isActive: boolean = false
 items: { date:string,time: string, title: string; description: string, isEditing: boolean, completed: boolean }[] =[]
-dialogRef: any
 listItem:any
 taskId: any
 data:any
@@ -61,7 +45,12 @@ variable: any
 error:any
 isLoading: boolean =true
 isTaskExist: boolean= false
-  constructor(private titleService: Title,private router: Router,private authService: AuthService,private dialog: MatDialog, private apiService: ApiService ){
+
+showShareDialog: boolean = false;
+currentShareTitle: string = '';
+showCreateListDialog: boolean = false; // New property for Create List dialog
+
+  constructor(private titleService: Title,private router: Router,private authService: AuthService, private apiService: ApiService ){
     titleService.setTitle('User Registeration App | ToDoList')
   }
  
@@ -92,20 +81,8 @@ isTaskExist: boolean= false
   
  }
 
-  openDialog(templateRef: TemplateRef<any>): void{
-    this.dialogRef = this.dialog.open(templateRef,{position:{top:'4%', left: '11%'},height: '250px',disableClose: false})
-
-     
-  
-     this.detectOutsideClick()
-  }
-  detectOutsideClick() {
-    if (!this.dialogRef) return;
-
-    this.dialogRef.backdropClick().subscribe(() => {
-      this.performActionOnOutsideClick();
-      this.checkingTitleAvailability = false
-    });
+  openDialog(): void{ // Modified signature
+    this.showCreateListDialog = true;
   }
   
   onFocus(){
@@ -173,7 +150,7 @@ isTaskExist: boolean= false
       
     },error: (error)=>{console.error(error)
     }})
-    this.dialogRef.close()
+    this.showCreateListDialog = false; // Close dialog
     this.taskTitleInput = ''
     this.taskDescriptionInput = ''
     this.titleToBeCreated = false
@@ -190,8 +167,7 @@ isTaskExist: boolean= false
      }
 
      deleteItem(dialogRef:TemplateRef<any>){
-     const dialogReferrence = this.dialog.open(dialogRef,{position:{top:'10%', left: '50%'},height: '250px'})
-      
+     
 
     }
      
@@ -237,7 +213,6 @@ isTaskExist: boolean= false
       
       
       // Close the dialog immediately
-      this.dialog.closeAll();
       
       // Proceed with the delete task request
       this.apiService.deleteTask(taskTitle).subscribe({
@@ -254,9 +229,11 @@ isTaskExist: boolean= false
       
     }
 
-    cancelDeletion(dialogRef: TemplateRef<any>){
-      this.dialog.closeAll()
-    }
+        cancelDeletion(dialogRef: TemplateRef<any>){
+
+          
+
+        }
     titleErrorCheckingFn(error:any){
       if (error.error) {
         this.titleErrorChecking = true
@@ -280,8 +257,7 @@ isTaskExist: boolean= false
       this.titleErrorChecking = false
       this.isDisabled = true
       this.isActive = false
-      this.dialogRef.close()
-      
+      this.showCreateListDialog = false; // Close dialog
     }
     getDate(): string{
       const currentDate = new Date();        
@@ -295,27 +271,24 @@ isTaskExist: boolean= false
     }
     
   openShareDialog(title: string): void {
-    const dialogRef = this.dialog.open(ShareDialogComponent, {
-      width: '350px',
-      data: { title: title }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.shareList(title, result);
-      }
-    });
+    this.currentShareTitle = title;
+    this.showShareDialog = true;
   }
 
-  shareList(title: string, email: string) {
-    this.apiService.shareTaskList(title, email).subscribe({
+  handleEmailShared(email: string): void {
+    this.apiService.shareTaskList(this.currentShareTitle, email).subscribe({
       next: (response) => {
-        console.log('List shared successfully');
+        console.log('List shared successfully', response);
       },
       error: (error) => {
         console.error('Error sharing list', error);
       }
     });
+    this.showShareDialog = false;
+  }
+
+  handleShareCancelled(): void {
+    this.showShareDialog = false;
   }
 
   clearCompletedTasks(): void {

@@ -1,48 +1,59 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { AuthService } from '../auth.service';
-import { ApiService } from '../api-service.service';
-import { Router } from '@angular/router';
-import { MatCardModule } from '@angular/material/card';
-import { SharedService } from '../shared.service';
-import { MatButtonModule } from '@angular/material/button';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { CommonModule } from '@angular/common'; // Needed for ngIf, etc.
+import { DeleteAccountDialogComponent } from '../delete-account-dialog/delete-account-dialog.component';
+import { SharedService } from '../shared.service'; // Keep SharedService for now
 
 @Component({
   selector: 'app-user-profile',
   standalone: true,
-  imports: [MatCardModule, MatButtonModule],
+  imports: [CommonModule, DeleteAccountDialogComponent],
   templateUrl: './user-profile.component.html',
   styleUrl: './user-profile.component.scss'
 })
 export class UserProfileComponent implements OnInit {
-  
-  username: any
-  email: any
-  profilePhoto: any
-  
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any, private sharedService: SharedService){}
+  @Input() username: string = '';
+  @Input() email: string = '';
+  @Input() profilePhoto: string = '';
+
+  @Output() logoutClicked = new EventEmitter<void>();
+  @Output() dashboardClicked = new EventEmitter<void>();
+  @Output() addAnotherAccountClicked = new EventEmitter<void>();
+  @Output() closeProfile = new EventEmitter<void>(); // To close this profile component
+
+  showDeleteAccountDialog: boolean = false;
+
+  constructor(private sharedService: SharedService) {} // Keep SharedService if it's used elsewhere
 
   ngOnInit(): void {
-    this.username = this.data.username
-    this.email = this.data.email
-    
-
-  }
-  logout(){
-    this.data.onLogout()
-  }
-  dashboard(){
-    this.data.onNavigateToDashboard()
-  }
-  openDeleteAccountDialog(){
-    this.sharedService.triggerTask()
-
-  }
-  addAnOtherAccount(){
-    this.data.onAddingAnotherAccount()
-    
+    // No longer relying on MAT_DIALOG_DATA for initial values
   }
 
+  logout(): void {
+    this.logoutClicked.emit();
+  }
 
+  dashboard(): void {
+    this.dashboardClicked.emit();
+  }
+
+  openDeleteAccountDialog(): void {
+    this.showDeleteAccountDialog = true;
+  }
+
+  addAnOtherAccount(): void {
+    this.addAnotherAccountClicked.emit();
+  }
+
+  handleDeleteConfirmed(): void {
+    console.log('User profile: Account deletion confirmed!');
+    // Emit an event or call a service method to handle actual deletion
+    this.showDeleteAccountDialog = false;
+    this.closeProfile.emit(); // Optionally close profile after deletion
+  }
+
+  handleDeletionCancelled(): void {
+    console.log('User profile: Account deletion cancelled.');
+    this.showDeleteAccountDialog = false;
+  }
 }

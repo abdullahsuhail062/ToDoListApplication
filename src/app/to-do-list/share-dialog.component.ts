@@ -1,8 +1,4 @@
-import { Component, Inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
-import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -13,20 +9,21 @@ import { CommonModule } from '@angular/common';
   imports: [
     CommonModule,
     FormsModule,
-    MatDialogModule,
-    MatButtonModule,
-    MatFormFieldModule,
-    MatInputModule,
   ],
 })
 export class ShareDialogComponent {
   email: string = '';
 
-  constructor(
-    public dialogRef: MatDialogRef<ShareDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any) {}
+  @Output() emailShared = new EventEmitter<string>();
+  @Output() cancelled = new EventEmitter<void>();
+
+  constructor() {}
 
   onNoClick(): void {
-    this.dialogRef.close();
+    this.cancelled.emit();
+  }
+
+  shareList(): void {
+    this.emailShared.emit(this.email);
   }
 }

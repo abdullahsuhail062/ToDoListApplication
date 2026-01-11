@@ -11,10 +11,20 @@
   </div>
   <div class="p-4 border-t border-gray-200">
     <div class="flex flex-col space-y-2">
-      <button mat-stroked-button color="primary" (click)="addAnOtherAccount()">Add Another Account</button>
-      <button mat-stroked-button color="primary" (click)="dashboard()">Dashboard</button>
-      <button mat-stroked-button color="warn" (click)="logout()">Logout</button>
-      <button mat-stroked-button color="warn" (click)="openDeleteAccountDialog()">Delete Account</button>
+      <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" (click)="addAnOtherAccount()">Add Another Account</button>
+      <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" (click)="dashboard()">Dashboard</button>
+      <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" (click)="logout()">Logout</button>
+      <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" (click)="openDeleteAccountDialog()">Delete Account</button>
     </div>
+  </div>
+</div>
+
+<!-- Custom Dialog Overlay for Delete Account -->
+<div *ngIf="showDeleteAccountDialog" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white rounded-lg shadow-xl max-w-sm w-full">
+    <app-delete-account-dialog
+      (deleteConfirmed)="handleDeleteConfirmed()"
+      (cancelled)="handleDeletionCancelled()"
+    ></app-delete-account-dialog>
   </div>
 </div>

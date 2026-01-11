@@ -1,10 +1,10 @@
 <div class="p-6 text-center">
-  <h2 mat-dialog-title class="text-2xl font-bold mb-4">Confirm Deletion</h2>
-  <mat-dialog-content class="mb-6">
+  <h2 class="text-2xl font-bold mb-4">Confirm Deletion</h2>
+  <div class="mb-6">
     <p class="text-lg">Are you sure you want to delete your account? This action cannot be undone.</p>
-  </mat-dialog-content>
-  <mat-dialog-actions class="flex justify-center space-x-4">
-    <button mat-raised-button color="warn" (click)="confirmDelete()">Yes, Delete</button>
-    <button mat-raised-button (click)="closeAll()">No, Cancel</button>
-  </mat-dialog-actions>
+  </div>
+  <div class="flex justify-center space-x-4">
+    <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" (click)="confirmDelete()">Yes, Delete</button>
+    <button class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded" (click)="closeAll()">No, Cancel</button>
+  </div>
 </div>

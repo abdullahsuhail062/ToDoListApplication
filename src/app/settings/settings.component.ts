@@ -1,9 +1,6 @@
 import { Component } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatInputModule } from '@angular/material/input';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
 import { DeleteAccountDialogComponent } from '../delete-account-dialog/delete-account-dialog.component';
 
 @Component({
@@ -14,14 +11,26 @@ import { DeleteAccountDialogComponent } from '../delete-account-dialog/delete-ac
   imports: [
     CommonModule,
     FormsModule,
-    MatButtonModule,
-    MatInputModule
+    DeleteAccountDialogComponent
   ],
 })
 export class SettingsComponent {
-  constructor(public dialog: MatDialog) {}
+  showDeleteAccountDialog: boolean = false;
+
+  constructor() {}
 
   openDeleteAccountDialog(): void {
-    this.dialog.open(DeleteAccountDialogComponent);
+    this.showDeleteAccountDialog = true;
+  }
+
+  handleDeleteConfirmed(): void {
+    // Logic to actually delete the account
+    console.log('Account deletion confirmed!');
+    this.showDeleteAccountDialog = false;
+  }
+
+  handleDeletionCancelled(): void {
+    console.log('Account deletion cancelled.');
+    this.showDeleteAccountDialog = false;
   }
 }
