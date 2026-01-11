@@ -1,76 +1,239 @@
-<div class="relative w-screen h-screen overflow-hidden bg-cover bg-center bg-no-repeat" style="background-image: url('/assets/bg-image.jpg');">
+<!-- Root -->
+<div
+  class="min-h-dvh w-full bg-cover bg-center bg-no-repeat flex flex-col"
+  style="background-image: url('/assets/bg-image.jpg');"
+>
+
   <!-- Toolbar -->
-  <mat-toolbar class="h-16 px-4 flex justify-between items-center bg-blue-800 text-white shadow-lg">
-    <span class="text-xl font-bold ml-4">User Registration App</span>
-    <div class="flex-grow"></div>
-    <div class="flex flex-wrap items-center gap-2 md:space-x-4 mr-4">
-      <button mat-stroked-button (click)="navigateToDoList()" class="text-white border-white">ToDoList</button>
-      <button mat-stroked-button routerLink="/settings" class="text-white border-white">Settings</button>
-      <button mat-icon-button (click)="toggleFavoriteState()" aria-label="Toggle favorite">
-        <mat-icon [ngClass]="{ 'text-red-500': isFavorite, 'text-gray-300': !isFavorite }">
+  <mat-toolbar
+    class="h-14 px-3 flex justify-between items-center
+           bg-blue-800 text-white shadow-lg"
+  >
+    <!-- App Title -->
+    <span class="text-lg sm:text-xl font-bold">
+      User Registration App
+    </span>
+
+    <!-- Desktop Actions -->
+    <div class="hidden md:flex items-center gap-2">
+      <button mat-stroked-button class="text-white border-white"
+        (click)="navigateToDoList()">
+        ToDoList
+      </button>
+
+      <button mat-stroked-button class="text-white border-white"
+        routerLink="/settings">
+        Settings
+      </button>
+
+      <button mat-icon-button (click)="toggleFavoriteState()">
+        <mat-icon
+          [ngClass]="{
+            'text-red-500': isFavorite,
+            'text-gray-300': !isFavorite
+          }"
+        >
           {{ isFavorite ? 'favorite' : 'favorite_border' }}
         </mat-icon>
       </button>
-      <button mat-icon-button (click)="toggleShareMenu($event)" aria-label="Share">
+
+      <button mat-icon-button (click)="toggleShareMenu($event)">
         <mat-icon>share</mat-icon>
       </button>
-      <button mat-fab color="primary" (click)="openProfileDialog()" class="w-10 h-10">
-        <span class="text-base font-bold">{{ profileInitial }}</span>
+
+      <button
+        mat-fab
+        color="primary"
+        class="w-9 h-9 text-sm"
+        (click)="openProfileDialog()"
+      >
+        {{ profileInitial }}
       </button>
     </div>
-  </mat-toolbar>
 
-  <!-- Welcome Message -->
-  <div *ngIf="showWelcomeMessage" class="absolute top-16 left-1/2 -translate-x-1/2 w-full max-w-sm sm:max-w-md p-4 sm:p-6 bg-blue-100 border border-blue-200 text-blue-700 rounded-md text-center shadow-md z-10">
+    <!-- Mobile Menu Button
+    <button
+      mat-icon-button
+      class="md:hidden"
+      (click)="toggleMobileMenu()"
+    >
+      <mat-icon>menu</mat-icon>
+    </button>
+  </mat-toolbar> -->
+
+  <!-- Offline Banner -->
+  <div
+    *ngIf="!isOnline"
+    class="bg-red-100 border-b-4 border-red-500
+           text-red-700 px-4 py-2 text-center font-semibold"
+  >
+    ⚠️ No Internet Connection
+  </div>
+
+  <!-- Main Content -->
+  <main class="flex-1 flex items-center justify-center px-4 py-6">
+
+    <!-- Weather Card -->
+    <div
+      class="w-full max-w-md sm:max-w-lg
+             bg-white/20 backdrop-blur-md
+             rounded-2xl shadow-xl
+             p-5 sm:p-7"
+    >
+      <h1 class="text-white text-xl sm:text-2xl font-bold mb-4">
+        Weather Update
+      </h1>
+
+      <!-- Search -->
+      <div class="flex flex-col sm:flex-row gap-2">
+        <input
+          matInput
+          [(ngModel)]="inputValue"
+          placeholder="Enter city name"
+          class="w-full bg-white/60 border-2 border-gray-300
+                 rounded-lg px-3 py-2
+                 focus:border-green-400 focus:outline-none"
+        />
+
+        <button
+          mat-raised-button
+          color="primary"
+          class="w-full sm:w-auto font-semibold"
+          (click)="search()"
+        >
+          Search
+        </button>
+      </div>
+
+      <!-- Error -->
+      <p
+        *ngIf="isCityNameCorrect"
+        class="text-red-400 text-sm mt-2"
+      >
+        {{ error }}
+      </p>
+
+      <!-- Weather Info -->
+      <div
+        *ngIf="hasDataFetched"
+        class="mt-4 text-white font-medium space-y-2"
+      >
+        <p>
+          <strong>Location:</strong>
+          {{ city }}, {{ region }}, {{ country }}
+        </p>
+
+        <p>
+          <strong>Last Updated:</strong>
+          {{ update }}
+        </p>
+
+        <p>
+          <strong>Weather:</strong>
+          {{ temp }}°C, {{ cloud }}% cloud
+        </p>
+
+        <div class="flex items-center gap-3">
+          <p>
+            <strong>Condition:</strong>
+            {{ weatherCondition }}
+          </p>
+
+          <img
+            [src]="weatherIcon"
+            alt="Weather"
+            class="w-12 h-12"
+          />
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Welcome Toast -->
+  <div
+    *ngIf="showWelcomeMessage"
+    class="fixed top-16 left-1/2 -translate-x-1/2
+           w-[90%] max-w-md
+           bg-blue-100 text-blue-800
+           border border-blue-200
+           rounded-md shadow-md
+           px-4 py-3 text-center z-40"
+  >
     <h2 class="font-bold">Welcome to the Dashboard!</h2>
     <p>We're glad to have you here.</p>
   </div>
 
-  <!-- Offline Warning -->
-  <div *ngIf="!isOnline" class="absolute top-0 left-0 w-full bg-red-100 border-t-4 border-red-500 text-red-700 px-4 py-3 text-center font-bold z-50">
-    ⚠️ No Internet Connection. Some features may not work.
-  </div>
-
   <!-- Share Menu -->
-  <div *ngIf="showShareMenu" class="absolute top-16 right-4 mt-2 w-full max-w-[12rem] bg-white rounded-md shadow-lg p-2 z-20 transition-transform" [class.translate-x-full]="!showShareMenu">
-    <button (click)="shareVia('facebook')" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-      <img src="/assets/facebook.png" alt="Facebook" class="w-6 h-6 mr-2">
+  <div
+    *ngIf="showShareMenu"
+    class="fixed top-16 right-4
+           w-48 bg-white
+           rounded-lg shadow-lg
+           p-2 z-40"
+  >
+    <button
+      class="flex items-center w-full px-3 py-2 text-sm
+             hover:bg-gray-100"
+      (click)="shareVia('facebook')"
+    >
+      <img src="/assets/facebook.png" class="w-5 h-5 mr-2">
       Facebook
     </button>
-    <button (click)="shareVia('whatsapp')" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-      <img src="/assets/whatsapp.png" alt="WhatsApp" class="w-6 h-6 mr-2">
+
+    <button
+      class="flex items-center w-full px-3 py-2 text-sm
+             hover:bg-gray-100"
+      (click)="shareVia('whatsapp')"
+    >
+      <img src="/assets/whatsapp.png" class="w-5 h-5 mr-2">
       WhatsApp
     </button>
-    <button (click)="copyLink()" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-      <img src="/assets/copy.png" alt="Copy Link" class="w-6 h-6 mr-2">
+
+    <button
+      class="flex items-center w-full px-3 py-2 text-sm
+             hover:bg-gray-100"
+      (click)="copyLink()"
+    >
+      <img src="/assets/copy.png" class="w-5 h-5 mr-2">
       Copy Link
     </button>
   </div>
 
-  <!-- Update Loader -->
-  <div *ngIf="isUpdateLoading" class="absolute inset-0 flex justify-center items-center bg-black bg-opacity-25 z-30">
-    <mat-progress-spinner color="primary" mode="indeterminate" diameter="50"></mat-progress-spinner>
+  <!-- Loader -->
+  <div
+    *ngIf="isUpdateLoading"
+    class="fixed inset-0 bg-black/30
+           flex items-center justify-center z-50"
+  >
+    <mat-progress-spinner
+      mode="indeterminate"
+      diameter="50"
+      color="primary"
+    ></mat-progress-spinner>
   </div>
 
-  <!-- Weather Update Section -->
-  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm sm:max-w-md p-4 sm:p-8 bg-white bg-opacity-20 backdrop-blur-md rounded-xl shadow-lg">
-    <h1 class="text-white text-2xl font-bold mb-4">Weather Update</h1>
-    <div class="flex flex-col sm:flex-row items-center gap-2 mb-2">
-      <input matInput [(ngModel)]="inputValue" class="flex-grow bg-white/50 border-2 border-gray-300 rounded-lg p-2 focus:border-green-400 focus:outline-none" placeholder="Enter city name">
-      <button mat-raised-button color="primary" (click)="search()" class="font-bold">Search</button>
-    </div>
-    <p class="text-red-400 text-sm" *ngIf="isCityNameCorrect">{{error}}</p>
+  <!-- Mobile Drawer -->
+  <!-- <div
+    *ngIf="showMobileMenu"
+    class="fixed inset-0 bg-black/40 z-50 flex"
+  > -->
+    <div class="ml-auto w-64 bg-white h-full p-4 space-y-3">
+      <button mat-button class="w-full" (click)="navigateToDoList()">
+        ToDoList
+      </button>
 
-    <div *ngIf="hasDataFetched" class="mt-4 text-white font-semibold space-y-2">
-      <p><strong>Location:</strong> {{ city }}, {{ region }}, {{ country }}</p>
-      <p><strong>Last updated:</strong> {{ update }}</p>
-      <div class="flex items-center">
-        <p><strong>Weather:</strong> {{ temp }}°C, {{ cloud }}% cloud</p>
-      </div>
-      <div class="flex items-center">
-        <p><strong>Condition:</strong> {{ weatherCondition }}</p>
-        <img [src]="weatherIcon" alt="Weather condition" class="w-12 h-12 ml-4">
-      </div>
+      <button mat-button class="w-full" routerLink="/settings">
+        Settings
+      </button>
+
+      <button mat-button class="w-full" (click)="openProfileDialog()">
+        Profile
+      </button>
+
+      <!-- <button mat-button class="w-full" (click)="toggleMobileMenu()">
+        Close
+      </button>
     </div>
-  </div>
-</div>
+  </div> -->
+
+
