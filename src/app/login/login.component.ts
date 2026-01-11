@@ -16,7 +16,7 @@ import { Title } from '@angular/platform-browser';
   selector: 'app-login',
   standalone: true,
   imports: [RouterLink, MatInputModule, MatProgressSpinnerModule,
-    MatInputModule, ReactiveFormsModule, CommonModule, NgIf, MatIconModule,],
+    ReactiveFormsModule, CommonModule, NgIf, MatIconModule,],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })
@@ -36,8 +36,7 @@ export class LoginComponent {
   constructor(private titleService: Title,private cdr: ChangeDetectorRef,private router: Router,private apiService: ApiService, private http: HttpClient){
     titleService.setTitle('User Registeration App |Login')
     this.loginForm = new FormGroup({email: new FormControl('',[Validators.required, Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)]),password: new FormControl('',[Validators.required,Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{8,}$/
-)]),confirmPassword: new FormControl('',[Validators.required,Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{8,}$/
-),Validators.minLength(8)])}) 
+)])}) 
     }
 
 
@@ -48,7 +47,6 @@ export class LoginComponent {
       password: this.loginForm.get('password')?.value
     }
    
-    this.passwordsMisMatchValidator()
     if (this.loginForm.valid) {
       this.toggleSpinner()
       

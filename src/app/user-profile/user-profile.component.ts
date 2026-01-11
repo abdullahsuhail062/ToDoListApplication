@@ -5,11 +5,12 @@ import { ApiService } from '../api-service.service';
 import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { SharedService } from '../shared.service';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-user-profile',
   standalone: true,
-  imports: [MatCardModule],
+  imports: [MatCardModule, MatButtonModule],
   templateUrl: './user-profile.component.html',
   styleUrl: './user-profile.component.scss'
 })

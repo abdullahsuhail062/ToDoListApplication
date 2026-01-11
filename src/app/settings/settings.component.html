@@ -1,1 +1,38 @@
-<p>settings works!</p>
+<div class="container mx-auto p-4 sm:p-8">
+  <h1 class="text-2xl font-bold mb-4">Settings</h1>
+
+  <div class="bg-white shadow-md rounded-lg p-6">
+    <div class="mb-6">
+      <h2 class="text-xl font-semibold mb-2">Change Username</h2>
+      <div class="flex items-center">
+        <input type="text" placeholder="New username" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+        <button mat-raised-button color="primary" class="ml-4">Save</button>
+      </div>
+    </div>
+
+    <div class="mb-6">
+      <h2 class="text-xl font-semibold mb-2">Change Password</h2>
+      <div class="space-y-4">
+        <div>
+          <label for="current-password" class="text-sm font-medium text-gray-700">Current Password</label>
+          <input id="current-password" type="password" class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+        <div>
+          <label for="new-password" class="text-sm font-medium text-gray-700">New Password</label>
+          <input id="new-password" type="password" class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+        <div>
+          <label for="confirm-password" class="text-sm font-medium text-gray-700">Confirm New Password</label>
+          <input id="confirm-password" type="password" class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+        <button mat-raised-button color="primary">Change Password</button>
+      </div>
+    </div>
+
+    <div>
+      <h2 class="text-xl font-semibold mb-2">Delete Account</h2>
+      <p class="text-gray-600 mb-4">Once you delete your account, there is no going back. Please be certain.</p>
+      <button mat-raised-button color="warn" (click)="openDeleteAccountDialog()">Delete Your Account</button>
+    </div>
+  </div>
+</div>

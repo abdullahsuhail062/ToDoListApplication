@@ -11,12 +11,13 @@ import { MatIconModule } from '@angular/material/icon'; // Import MatIconModule
 import { ApiService } from '../api-service.service';
 import { AuthService } from '../auth.service';
 import { Title } from '@angular/platform-browser';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-registeration',
   standalone: true,
   imports: [RouterLink,MatInputModule,
-    MatInputModule,ReactiveFormsModule,CommonModule,NgIf,MatIconModule],
+    MatInputModule,ReactiveFormsModule,CommonModule,NgIf,MatIconModule, MatProgressSpinnerModule],
   templateUrl: './registeration.component.html',
   styleUrl: './registeration.component.scss'
 })

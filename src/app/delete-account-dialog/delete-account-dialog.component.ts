@@ -1,13 +1,14 @@
 import { Component } from '@angular/core';
 import { Inject } from '@angular/core';
 import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef, MatDialog } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
 
 
 
 @Component({
   selector: 'app-delete-account-dialog',
   standalone: true,
-  imports: [],
+  imports: [MatDialogModule, MatButtonModule],
   templateUrl: './delete-account-dialog.component.html',
   styleUrl: './delete-account-dialog.component.scss'
 })

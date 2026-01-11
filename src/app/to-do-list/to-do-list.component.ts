@@ -1,7 +1,7 @@
 import { NgClass, NgFor, NgIf } from '@angular/common';
 import { Component, OnInit, TemplateRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatDialog, MatDialogContent } from '@angular/material/dialog';
+import { MatDialog, MatDialogContent, MatDialogModule } from '@angular/material/dialog';
  import{MatToolbarModule} from '@angular/material/toolbar'
 import { ApiService } from '../api-service.service';
 import { MatList, MatListItem} from '@angular/material/list';
@@ -9,11 +9,29 @@ import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { ShareDialogComponent } from './share-dialog.component';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
   selector: 'app-to-do-list',
   standalone: true,
-  imports: [NgIf,MatToolbarModule, MatDialogContent,FormsModule,NgClass,NgFor,MatListItem,MatList],
+  imports: [
+    NgIf,
+    MatToolbarModule,
+    MatDialogContent,
+    FormsModule,
+    NgClass,
+    NgFor,
+    MatListItem,
+    MatList,
+    MatButtonModule,
+    MatIconModule,
+    MatDialogModule,
+    MatInputModule,
+    MatCheckboxModule
+  ],
   templateUrl: './to-do-list.component.html',
   styleUrl: './to-do-list.component.scss',
 })

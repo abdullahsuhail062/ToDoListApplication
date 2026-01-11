@@ -1,8 +1,10 @@
-<div class="flex flex-col items-center justify-start p-6">
-  <h2 class="text-2xl font-bold mb-4">Confirm Deletion</h2>
-  <p class="text-lg mb-4">Are you sure you want to delete your account?</p>
-  <div class="flex justify-center items-center">
-    <button mat-button class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded mr-2" (click)="confirmDelete()">Yes</button>
-    <button mat-button class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded" (click)="closeAll()">No</button>
-  </div>
+<div class="p-6 text-center">
+  <h2 mat-dialog-title class="text-2xl font-bold mb-4">Confirm Deletion</h2>
+  <mat-dialog-content class="mb-6">
+    <p class="text-lg">Are you sure you want to delete your account? This action cannot be undone.</p>
+  </mat-dialog-content>
+  <mat-dialog-actions class="flex justify-center space-x-4">
+    <button mat-raised-button color="warn" (click)="confirmDelete()">Yes, Delete</button>
+    <button mat-raised-button (click)="closeAll()">No, Cancel</button>
+  </mat-dialog-actions>
 </div>

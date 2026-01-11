@@ -2,7 +2,7 @@ import { Component, ElementRef, HostListener, OnInit, ChangeDetectorRef, OnDestr
 import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { UserProfileComponent } from '../user-profile/user-profile.component';
-import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { MatDialog, MatDialogConfig, MatDialogModule } from '@angular/material/dialog';
 import { ApiService } from '../api-service.service';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { CommonModule, NgIf } from '@angular/common';
@@ -14,12 +14,14 @@ import { MatIconModule } from '@angular/material/icon'; // Changed MatIcon to Ma
 import { Clipboard } from '@angular/cdk/clipboard';
 import { Observable, Subscription } from 'rxjs';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatButtonModule } from '@angular/material/button';
+import { MatInputModule } from '@angular/material/input';
 
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [MatToolbarModule, NgIf, FormsModule, CommonModule, MatProgressSpinnerModule, MatIconModule], // Cleaned up imports
+  imports: [MatToolbarModule, NgIf, FormsModule, CommonModule, MatProgressSpinnerModule, MatIconModule, MatButtonModule, MatInputModule, MatDialogModule], // Cleaned up imports
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
