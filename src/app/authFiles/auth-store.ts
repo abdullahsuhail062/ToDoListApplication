@@ -1,6 +1,5 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { User } from './user-Interface';
-import { NonNullableFormBuilder } from '@angular/forms';
 
 
 @Injectable({ providedIn: 'root' })
@@ -17,9 +16,9 @@ export class AuthStore {
     return !!token;
   });
 
-   setSession(token: string | null, user: User | null) {
-    this.tokenSignal.set(token);
-    this.userSignal.set(user);
+   setSession(data:{token: string | null, user: User | null}) {
+    this.tokenSignal.set(data.token);
+    this.userSignal.set(data.user);
   }
 
 

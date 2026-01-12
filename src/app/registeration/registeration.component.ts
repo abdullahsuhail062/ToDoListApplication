@@ -65,7 +65,7 @@ export class RegisterationComponent  {
     this.apiService.registerUser(formData).subscribe({next: (data) => {localStorage.setItem('isWelcomed', 'false');
       if (data.token){console.log(data.token);
       
-        this.authService.saveToken(data.token)
+        this.authService.saveToken(data.token, data.user)
         this.router.navigate(['/dashboard'])};
     }, error: (error) => { 
       this.signiUpStatus()
