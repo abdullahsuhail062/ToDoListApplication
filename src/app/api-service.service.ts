@@ -43,18 +43,13 @@ export class ApiService {
   }
 
   fetchUserProfile(): Observable<any>{
-    const token = this.authService.getToken()
-    return this.http.get(`${this.apiUrl}/api/fetchUserProfile`,{responseType: 'json',headers: { 'Authorization': `Bearer ${token}`}}
-    )
-  }
+    return this.http.get(`${this.apiUrl}/api/fetchUserProfile`)}
   deleteAccount(): Observable<any> {
-    const token = this.authService.getToken()
-    return this.http.delete(`${this.apiUrl}/api/deleteAccount`,{headers: { 'Authorization': `Bearer ${token}`}});
+    return this.http.delete(`${this.apiUrl}/api/deleteAccount`);
   }
 
   addTask(title:any,description: any,token: any,date:string | null,time:string | null): Observable<any> {
-    token = this.authService.getToken()    
-    return this.http.post(`${this.apiUrl}/api/tasks`,  {title,description,date,time},{headers: { 'Authorization': `Bearer ${token}`}});
+    return this.http.post(`${this.apiUrl}/api/tasks`,  {title,description,date,time});
 }
     
 saveTask(title:any,description: any,taskId:any): Observable<any>{
@@ -89,23 +84,16 @@ onFocusTitleChecking(title: string): Observable<any> {
 }
 
 toggleFavoriteIconState(isFavorite: boolean): Observable<any> {
-  const token = this.authService.getToken();
-
-  const headers = new HttpHeaders({
-    'Authorization': `Bearer ${token}`,
-    'Content-Type': 'application/json'  // Ensure proper request format
-  });
+  
 
   return this.http.post(`${this.apiUrl}/api/toggleFavoriteIconState`, 
-    { isFavorite },  // Send `isFavorite` in the request body
-    { headers }      // Set headers correctly
+    { isFavorite }
   );
 }
 
 
 fetchFavoriteIconState(): Observable<any>{
-  const token = this.authService.getToken()
-  return this.http.get(`${this.apiUrl}/api/fetchfavoriteIconState`,{headers: { 'Authorization': `Bearer ${token}`}})
+  return this.http.get(`${this.apiUrl}/api/fetchfavoriteIconState`)
   
 }
 
@@ -120,14 +108,12 @@ fetchWeatherForecastBySearch(city: string): Observable<any> {
   
 }
 shareTaskList(title: string, email: string): Observable<any> {
-  const token = this.authService.getToken();
-  return this.http.post(`${this.apiUrl}/api/shareTaskList`, { title, email }, { headers: { 'Authorization': `Bearer ${token}` } });
+  return this.http.post(`${this.apiUrl}/api/shareTaskList`, { title, email });
 }
 
   deleteCompletedTasks(taskTitles: string[]): Observable<any> {
-    const token = this.authService.getToken();
-    return this.http.delete(`${this.apiUrl}/api/deleteCompletedTasks`, { 
-      headers: { 'Authorization': `Bearer ${token}` },
+    
+    return this.http.delete(`${this.apiUrl}/api/deleteCompletedTasks`,{
       body: { titles: taskTitles } 
     });
   }
