@@ -10,6 +10,8 @@ import { HttpClient,} from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon'; // Import MatIconModule
 import { ApiService } from '../api-service.service';
 import { Title } from '@angular/platform-browser';
+import { AuthService } from '../authFiles/auth.service';
+
 
 
 @Component({
@@ -33,7 +35,7 @@ export class LoginComponent {
   isLoading: boolean = false
   isLoggingIn: boolean = false
 
-  constructor(private titleService: Title,private cdr: ChangeDetectorRef,private router: Router,private apiService: ApiService, private http: HttpClient){
+  constructor(private authService: AuthService,private titleService: Title,private cdr: ChangeDetectorRef,private router: Router,private apiService: ApiService, private http: HttpClient){
     titleService.setTitle('User Registeration App |Login')
     this.loginForm = new FormGroup({email: new FormControl('',[Validators.required, Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)]),password: new FormControl('',[Validators.required,Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{8,}$/
 )])}) 

@@ -2,7 +2,7 @@ import { NgClass, NgFor, NgIf } from '@angular/common';
 import { Component, OnInit, TemplateRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../api-service.service';
-import { AuthService } from '../auth.service';
+import { AuthService } from '../authFiles/auth.service';
 import { Router } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { ShareDialogComponent } from './share-dialog.component';

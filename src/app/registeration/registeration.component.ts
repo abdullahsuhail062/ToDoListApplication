@@ -9,7 +9,7 @@ import { CommonModule, NgIf } from '@angular/common';
 import { HttpClient,} from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon'; // Import MatIconModule
 import { ApiService } from '../api-service.service';
-import { AuthService } from '../auth.service';
+import { AuthService } from '../authFiles/auth.service';
 import { Title } from '@angular/platform-browser';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 

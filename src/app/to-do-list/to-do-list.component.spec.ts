@@ -3,7 +3,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { of } from 'rxjs';
 import { ToDoListComponent } from './to-do-list.component';
 import { ApiService } from '../api-service.service';
-import { AuthService } from '../auth.service';
+import { AuthService } from '../authFiles/auth.service';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Title } from '@angular/platform-browser';

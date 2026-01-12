@@ -1,377 +1,362 @@
-import { Component, ElementRef, HostListener, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  OnInit,
+  OnDestroy,
+  ChangeDetectorRef,
+  inject,
+  PLATFORM_ID
+} from '@angular/core';
+import { isPlatformBrowser, CommonModule, NgIf } from '@angular/common';
 import { Router } from '@angular/router';
-import { AuthService } from '../auth.service';
-import { UserProfileComponent } from '../user-profile/user-profile.component';
-import { MatDialog, MatDialogConfig, MatDialogModule } from '@angular/material/dialog';
-import { ApiService } from '../api-service.service';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { CommonModule, NgIf } from '@angular/common';
-import { DeleteAccountDialogComponent } from '../delete-account-dialog/delete-account-dialog.component';
-import { SharedService } from '../shared.service';
 import { FormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
-import { MatIconModule } from '@angular/material/icon'; // Changed MatIcon to MatIconModule
-import { Clipboard } from '@angular/cdk/clipboard';
-import { Observable, Subscription } from 'rxjs';
+
+
+import { MatDialog, MatDialogConfig, MatDialogModule } from '@angular/material/dialog';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 
+import { Clipboard } from '@angular/cdk/clipboard';
+import { Observable, Subscription } from 'rxjs';
+
+import { AuthService } from '../authFiles/auth.service';
+import { ApiService } from '../api-service.service';
+import { SharedService } from '../shared.service';
+import { UserProfileComponent } from '../user-profile/user-profile.component';
+import { DeleteAccountDialogComponent } from '../delete-account-dialog/delete-account-dialog.component';
+import { AuthStore } from '../authFiles/auth-store';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [MatToolbarModule, NgIf, FormsModule, CommonModule, MatProgressSpinnerModule, MatIconModule, MatButtonModule, MatInputModule, MatDialogModule], // Cleaned up imports
+  imports: [
+    CommonModule,
+    NgIf,
+    FormsModule,
+    MatToolbarModule,
+    MatDialogModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+    MatButtonModule,
+    MatInputModule
+  ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent implements OnInit, OnDestroy {
-  profileInitial: string = ''
-  userPrompt: string = ''
-  email: string | null = null
-  isUpdateLoading:boolean = false
-  hasDataFetched:boolean = false
-  weatherCondition: string = ''
-  weatherIcon:string = ''
-  name: string = ''
-  inputValue: string = ''
-  showShareMenu: boolean = false
-  modifiedDateFormate: string = ''
-  update: string = ''
-  city: string = ''
-  temp: string = ''
-  cloud: string = ''
-  region: string = ''
-  refreshInterval: any
-  error: string = ''
-  isCityNameCorrect: boolean = false
-  country: string = ''
-  closeOutsideClick: any
-  isFavorite: boolean = false
-  location:any
-  showWelcomeMessage: boolean = false;
-  isOnline = navigator.onLine
-  currentUrl = window.location.href; // Gets the current page URL
-  private weatherSubscription!: Subscription
+
+  /* ---------------------------------- */
+  /* Platform / SSR                     */
+  /* ---------------------------------- */
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+
+  /* ---------------------------------- */
+  /* Auth Store                         */
+  /* ---------------------------------- */
+  readonly store = inject(AuthStore)
+  readonly isLoggedIn = this.store.isLoggedIn();
+  readonly token = this.store.token;
+
+  /* ---------------------------------- */
+  /* UI State                           */
+  /* ---------------------------------- */
+  profileInitial = '';
+  showWelcomeMessage = false;
+  showShareMenu = false;
+  isFavorite = false;
+  isUpdateLoading = false;
+  hasDataFetched = false;
+  isCityNameCorrect = false;
+
+  /* ---------------------------------- */
+  /* Network / Browser                  */
+  /* ---------------------------------- */
+  isOnline = this.isBrowser ? navigator.onLine : true;
+  currentUrl = this.isBrowser ? window.location.href : '';
   url = encodeURIComponent('https://user-registeration-web-app-j6zm.vercel.app/dashboard');
-  constructor(private cdr: ChangeDetectorRef, private elementRef: ElementRef, private clipboard: Clipboard, private titleService: Title, private sharedService: SharedService, private router: Router, private authservice: AuthService, private dialog: MatDialog, private apiService: ApiService) {
-    titleService.setTitle('User Registeration App | Dashbord')
+
+  /* ---------------------------------- */
+  /* Weather                            */
+  /* ---------------------------------- */
+  city = '';
+  region = '';
+  country = '';
+  temp = '';
+  cloud = '';
+  update = '';
+  weatherCondition = '';
+  weatherIcon = '';
+  inputValue = '';
+  error = '';
+  location: any;
+
+  /* ---------------------------------- */
+  /* Misc                               */
+  /* ---------------------------------- */
+  userPrompt = '';
+  email: string | null = null;
+
+  private refreshInterval: any;
+  private weatherSubscription?: Subscription;
+
+  constructor(
+    private readonly router: Router,
+    private readonly authService: AuthService,
+    private readonly apiService: ApiService,
+    private readonly sharedService: SharedService,
+    private readonly dialog: MatDialog,
+    private readonly clipboard: Clipboard,
+    private readonly elementRef: ElementRef,
+    private readonly cdr: ChangeDetectorRef,
+    title: Title
+  ) {
+    title.setTitle('User Registration App | Dashboard');
   }
+
+  /* ---------------------------------- */
+  /* Lifecycle                          */
+  /* ---------------------------------- */
+
   ngOnInit(): void {
-    window.addEventListener('online', () => {this.isOnline = true; location.reload();});
-    window.addEventListener('offline', () =>{ this.isOnline = false; this.isUpdateLoading = false});
-    this.isUpdateLoading = true
-    this.fetchFavoriteIconState()
-    this.fetchTaskFn()
-    this.greetUser()
-  this.getLocationObservable().subscribe({
-    next: (location) => {
-      this.location = location; // Assign location here
-      this.fetchWeaterUpdate(location);
-      this.isUpdateLoading = false;
-
-      this.refreshInterval = setInterval(() => {
-        this.fetchWeaterUpdate(this.location); // Now this.location is guaranteed to be set
-      }, 900000);
-    },
-    error: (error) => {
-      console.error('Geolocation error:', error);
-      this.isUpdateLoading = false;
-      // Optionally handle error for refreshInterval here too, or prevent it from starting
+    if (this.isBrowser) {
+      window.addEventListener('online', () => (this.isOnline = true));
+      window.addEventListener('offline', () => (this.isOnline = false));
     }
-  });
 
-     
-
-     
-   
+    this.isUpdateLoading = true;
+    this.fetchFavoriteIconState();
+    this.fetchTaskFn();
+    this.greetUser();
+    this.initWeather();
   }
 
-  search(){
-    this.fetchWeatherBySearch()    
-    this.inputValue = ''
-    
-
+  ngOnDestroy(): void {
+    if (this.refreshInterval) clearInterval(this.refreshInterval);
+    this.weatherSubscription?.unsubscribe();
   }
+
+  /* ---------------------------------- */
+  /* Auth Actions (STORE ONLY)           */
+  /* ---------------------------------- */
+
+  logout(): void {
+    this.authService.logout();
+    this.dialog.closeAll();
+  }
+
+  /* ---------------------------------- */
+  /* Navigation                         */
+  /* ---------------------------------- */
+
+  navigateToDoList() {
+    this.router.navigate(['/ToDoList']);
+  }
+
+  backToHome() {
+    this.router.navigate(['/dashboard']);
+  }
+
+  /* ---------------------------------- */
+  /* Share                              */
+  /* ---------------------------------- */
 
   toggleShareMenu(event: Event) {
-    event.stopPropagation()
-    this.showShareMenu = !this.showShareMenu
-
-  }
-  shareVia(platform: string) {
-    let shareUrl = '';
-    switch (platform) {
-      case 'facebook':
-        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${this.currentUrl}`;
-        break;
-      case 'whatsapp':
-        shareUrl = `https://wa.me/?text=${this.url}`;
-        break;
-    }
-    window.open(shareUrl, '_blank');
-    this.showShareMenu = false; // Close menu after clicking
+    event.stopPropagation();
+    this.showShareMenu = !this.showShareMenu;
   }
 
   copyLink() {
-    this.clipboard.copy(this.currentUrl)
-    alert('Link copied to clipboard!');
+    this.clipboard.copy(this.currentUrl);
+    alert('Link copied!');
     this.showShareMenu = false;
-
   }
+
+  shareVia(platform: string) {
+    const shareUrl =
+      platform === 'facebook'
+        ? `https://www.facebook.com/sharer/sharer.php?u=${this.currentUrl}`
+        : `https://wa.me/?text=${this.url}`;
+
+    if (this.isBrowser) window.open(shareUrl, '_blank');
+    this.showShareMenu = false;
+  }
+
   @HostListener('document:click', ['$event'])
-  onClickOutside(event: Event) {
-
-
-    const shareMenuElement = this.elementRef.nativeElement.querySelector('.share-menu');
-
-    const isInside = shareMenuElement ? shareMenuElement.contains(event.target) : false;
-
-    if (this.showShareMenu && !isInside) {
+  closeShareMenu(event: Event) {
+    const menu = this.elementRef.nativeElement.querySelector('.share-menu');
+    if (this.showShareMenu && menu && !menu.contains(event.target)) {
       this.showShareMenu = false;
-
-      // Force UI update
       this.cdr.detectChanges();
     }
-
   }
 
+  /* ---------------------------------- */
+  /* Profile / Dialog                   */
+  /* ---------------------------------- */
 
-
-
-
-  fetchFavoriteIconState() {
-    this.apiService.fetchFavoriteIconState().subscribe({
+  openProfileDialog() {
+    this.apiService.fetchUserProfile().subscribe({
       next: (data) => {
-        if (data) {
-          this.isFavorite = data.isFavorite
-
-        }
-      }, error: (error) => {
-        console.error(error.error.error);
+        this.dialog.open(UserProfileComponent, {
+          position: { top: '55px', right: '0px' },
+          width: '180px',
+          data: {
+            username: data.username,
+            email: data.email,
+            onLogout: () => this.logout()
+          }
+        });
+        this.email = data.email;
       }
-    })
+    });
+  }
+
+  openDeleteAccountDialog() {
+    this.dialog.open(DeleteAccountDialogComponent, {
+      width: '400px',
+      data: {
+        onConfirmDelete: () => this.confirmDelete()
+      }
+    });
+  }
+
+  confirmDelete() {
+    this.apiService.deleteAccount().subscribe({
+      next: () => {
+        this.authService.logout()
+        this.router.navigate(['/login']);
+      }
+    });
+  }
+
+  /* ---------------------------------- */
+  /* Weather                            */
+  /* ---------------------------------- */
+
+  initWeather() {
+    if (!this.isBrowser) return;
+
+    this.getLocationObservable().subscribe({
+      next: (loc) => {
+        this.location = loc;
+        this.fetchWeather(loc);
+        this.refreshInterval = setInterval(() => {
+          this.fetchWeather(loc);
+        }, 900000);
+      },
+      error: () => (this.isUpdateLoading = false)
+    });
+  }
+
+  fetchWeather(location: { latitude: number; longitude: number }) {
+    this.weatherSubscription = this.apiService.fetchWeatherForecast(location).subscribe({
+      next: (data) => {
+        this.hasDataFetched = true;
+        this.isUpdateLoading = false;
+        this.city = data.location.name;
+        this.region = data.location.region;
+        this.country = data.location.country;
+        this.temp = data.current.temp_c;
+        this.cloud = data.current.cloud;
+        this.weatherCondition = data.current.condition.text;
+        this.weatherIcon = data.current.condition.icon;
+        this.update = data.current.last_updated.replace(' ', ': ');
+      },
+      error: () => (this.isUpdateLoading = false)
+    });
+  }
+
+  getLocationObservable(): Observable<any> {
+    return new Observable((subscriber) => {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          subscriber.next({
+            latitude: pos.coords.latitude,
+            longitude: pos.coords.longitude
+          });
+          subscriber.complete();
+        },
+        (err) => subscriber.error(err)
+      );
+    });
+  }
+
+  search() {
+    this.fetchWeatherBySearch();
+    this.inputValue = '';
+  }
+
+  fetchWeatherBySearch() {
+    if (this.inputValue.trim().length > 0) {
+      this.apiService.fetchWeatherForecastBySearch(this.inputValue).subscribe({
+        next: (data) => {
+          this.hasDataFetched = true;
+          this.isCityNameCorrect = false;
+          this.city = data.location.name;
+          this.region = data.location.region;
+          this.country = data.location.country;
+          this.temp = data.current.temp_c;
+          this.cloud = data.current.cloud;
+          this.weatherCondition = data.current.condition.text;
+          this.weatherIcon = data.current.condition.icon;
+          this.update = data.current.last_updated.replace(' ', ': ');
+        },
+        error: (error) => {
+          this.error = 'City not found, check spelling';
+          this.isCityNameCorrect = true;
+        }
+      });
+    }
   }
 
   toggleFavoriteState() {
     this.apiService.toggleFavoriteIconState(this.iconState()).subscribe({
       next: (data) => {
         if (data.isFavorite) {
-          this.isFavorite = data.isFavorite
-
+          this.isFavorite = data.isFavorite;
         }
-      }, error: (error) => {
+      },
+      error: (error) => {
         console.error(error.error);
       }
-    })
-
+    });
   }
+
   iconState(): boolean {
-    return this.isFavorite = !this.isFavorite
+    return (this.isFavorite = !this.isFavorite);
   }
+  
+  /* ---------------------------------- */
+  /* Misc                               */
+  /* ---------------------------------- */
 
-
-  logout() {
-    this.authservice.logout()
-    this.router.navigate(['/login'])
-    this.dialog.closeAll()
-  }
-
-  dashboard() {
-    this.router.navigate(['/dashboard'])
-    this.dialog.closeAll()
-
-
-  }
-  confirmDelete() {
-    this.apiService.deleteAccount().subscribe({
-      next:
-        (response) => {
-          this.authservice.deleteToken()
-          this.router.navigate(['/login'])
-          this.dialog.closeAll()
-          // Perform any necessary clean-up or redirect
-        },
-      error: (error) => {
-        this.handleError(error)
-      }
-    }
-    );
-  }
-
-
-
-  closeAllDialog() {
-    this.dialog.closeAll()
-  }
-
-
-  openDeleteAccountDialog() {
-    const dialogRef = this.dialog.open(DeleteAccountDialogComponent, { position: { right: '0px' }, width: '400px', data: { onConfirmDelete: () => this.confirmDelete(), onCloseAll: () => this.closeAllDialog() } })
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result === 'confirm') {
-        this.confirmDelete()
-
-
-
-
-      }
-    })
-
-
-  }
-  onAddAnotherAccount() {
-    this.dialog.closeAll()
-    this.authservice.logout()
-    this.router.navigate(['/login'])
-  }
-
-
-  openProfileDialog(): void {
-    const dialogConfig = new MatDialogConfig
-    dialogConfig.height = '400px'
-    this.apiService.fetchUserProfile().subscribe({
-      next: (userdata) => {
-        this.dialog.open(UserProfileComponent, { position: { top: '55px', right: '0px' }, width: '180px', panelClass: 'custom-dialog', data: { username: userdata.username, email: userdata.email, onLogout: () => this.logout(), onNavigateToDashboard: () => this.dashboard(), onOpenDeleteAccountDialog: () => this.openDeleteAccountDialog(), onAddingAnotherAccount: () => this.onAddAnotherAccount() } })
-        this.email = userdata.email
-      }, error: (error) => {
-        this.handleError(error)
-      }
-    })
-
-  }
   greetUser() {
-    const isWelcomed = localStorage.getItem('isWelcomed');
-
-    if (isWelcomed === null || isWelcomed === 'false') {
-      this.showWelcomeMessage = true; // Show the welcome message
-      // Update the flag to avoid showing it again
+    if (!this.isBrowser) return;
+    if (!localStorage.getItem('isWelcomed')) {
+      this.showWelcomeMessage = true;
       localStorage.setItem('isWelcomed', 'true');
     }
   }
-  navigateToDoList() {
-    this.router.navigate(['/ToDoList'])
+
+  fetchFavoriteIconState() {
+    this.apiService.fetchFavoriteIconState().subscribe({
+      next: (data) => (this.isFavorite = data?.isFavorite)
+    });
   }
 
-  handleError(error: any) {
-    console.log(error.error);
-
-  }
-
-  navigateToCalculator() {
-    this.router.navigate(['/calculator'])
-  }
-
-  backToHome() {
-    this.router.navigate(['/dashboard'])
-  }
-  sendRequest() {
-    this.apiService.getCompletion(this.userPrompt).subscribe({
-      next: (response) => { response }
-    })
-
-
-  }
   fetchTaskFn() {
     this.apiService.fetchUserProfile().subscribe({
-      next: (data) => {
-        this.profileInitial = data.email ? data.email.charAt(0).toUpperCase() : '';
-      }, error: (error) => { this.handleError(error) }
-    })
-    this.sharedService.taskTriggered$.subscribe(() => { this.openDeleteAccountDialog() })
-  }
- 
- 
-  fetchWeaterUpdate(location:{latitude: number, longitude: number}){
-  
-    
-    this.weatherSubscription =  this.apiService.fetchWeatherForecast(location).subscribe({
-      next: (data) => {this.isDataFetched(); this.city=`${data.location.name}`,this.region=`${data.location.region}`,this.country =`${data.location.country}`;
-       this.modifiedDateFormate =`${data.current.last_updated}`; this.temp = `${data.current.temp_c}`, this.cloud = `${data.current.cloud}`
-       let updatedFormate= this.modifiedDateFormate.split('')
-       updatedFormate[9] = this.modifiedDateFormate[9] + ':'
-       this.update = updatedFormate.join('');
-       this.weatherCondition = `${data.current.condition.text}`, this.weatherIcon = `${data.current.condition.icon}`
-
-       
-        
-      }, error: (error) => {console.error(error.error.error);
-       this.isUpdateLoading = false; // Reset loading on error
-      }
-    })
-  }
-
-     getLocationObservable():Observable<any> {
-       return new Observable((subscriber) => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            // Emit the location (latitude and longitude)
-            subscriber.next({
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude
-            });
-            subscriber.complete();
-          },
-          (error) => {
-            // Handle error, e.g., permission denied
-            subscriber.error(error);
-            this.isUpdateLoading = false // Reset loading on error
-          }
-        );
-      } else {
-        subscriber.error('Geolocation is not supported by this browser.');
-      }
+      next: (data) =>
+        (this.profileInitial = data.email?.charAt(0).toUpperCase() ?? '')
     });
-    
-    
 
-  }
-
-  fetchWeatherBySearch(){
-    if (this.inputValue.trim().length>0) {
-      
-    
-    this.apiService.fetchWeatherForecastBySearch(this.inputValue).subscribe({
-      next: (data) => { this.isCityNameCorrect = false; this.city=`${data.location.name}`,this.region=`${data.location.region}`,this.country =`${data.location.country}`;
-       this.modifiedDateFormate =`${data.current.last_updated}`; this.temp = `${data.current.temp_c}`, this.cloud = `${data.current.cloud}`
-       let updatedFormate= this.modifiedDateFormate.split('')
-       updatedFormate[9] = this.modifiedDateFormate[9] + ':'
-       this.update = updatedFormate.join('');
-       this.weatherCondition = `${data.current.condition.text}`, this.weatherIcon = `${data.current.condition.icon}`
-  }, error: (error) => {console.log(error,'this is error!');
-    this.error = 'City not found, check spelling'
-    this.isCityNameCorrect = true
-    
-  
-    }})
+    this.sharedService.taskTriggered$.subscribe(() =>
+      this.openDeleteAccountDialog()
+    );
   }
 }
-ngOnDestroy() {
-  // Clean up the interval when the component is destroyed
-  if (this.refreshInterval) {
-    clearInterval(this.refreshInterval);
-  }
-  if (this.weatherSubscription) {
-    this.weatherSubscription.unsubscribe();
-  }
-}
-
-isDataFetched(){
-  this.hasDataFetched = true
-}
-
-  
-}
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,6 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
-import { AuthService } from './auth.service';
+import { AuthService } from './authFiles/auth.service';
 
 
 @Component({

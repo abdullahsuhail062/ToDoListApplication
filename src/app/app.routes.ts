@@ -3,7 +3,7 @@ import { RegisterationComponent } from './registeration/registeration.component'
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { LoginComponent } from './login/login.component';
 import { UserProfileComponent } from './user-profile/user-profile.component';
-import { authGuard, loginGuard } from './auth.guard';
+import { authGuard, loginGuard } from './authFiles/auth.guard';
 import { ToDoListComponent } from './to-do-list/to-do-list.component';
 import { SettingsComponent } from './settings/settings.component';
 

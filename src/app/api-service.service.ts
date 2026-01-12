@@ -3,7 +3,7 @@ import { catchError, Observable, switchMap, throwError } from 'rxjs';
 import { environmentProd } from './environments/environment.prod'; 
 import { weatherForecastEnvironment, weatherApiBaseUrl } from './environments/environment.prod';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { AuthService } from './auth.service';
+import { AuthService } from './authFiles/auth.service';
 
 
 
