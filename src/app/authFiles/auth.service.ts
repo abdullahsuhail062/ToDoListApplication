@@ -59,4 +59,11 @@ export class AuthService {
       return true;
     }
   }
+
+   greetUser() {
+    if (!this.isBrowser) return;
+    if (!localStorage.getItem('isWelcomed')) {
+      localStorage.setItem('isWelcomed', 'true');
+    }
+  }
 }

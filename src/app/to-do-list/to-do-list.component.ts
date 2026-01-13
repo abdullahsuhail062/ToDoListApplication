@@ -6,6 +6,7 @@ import { AuthService } from '../authFiles/auth.service';
 import { Router } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { ShareDialogComponent } from './share-dialog.component';
+import { AuthStore } from '../authFiles/auth-store';
 
 @Component({
   selector: 'app-to-do-list',
@@ -50,13 +51,13 @@ showShareDialog: boolean = false;
 currentShareTitle: string = '';
 showCreateListDialog: boolean = false; // New property for Create List dialog
 
-  constructor(private titleService: Title,private router: Router,private authService: AuthService, private apiService: ApiService ){
+  constructor(private authStore: AuthStore,private titleService: Title,private router: Router,private authService: AuthService, private apiService: ApiService ){
     titleService.setTitle('User Registeration App | ToDoList')
   }
  
  
   ngOnInit(): void {
-  const token =this.authService.getToken()
+  const token =this.authStore.token()
     this.apiService.getTasks(token).subscribe({next:(tasks)=>{
     
     
@@ -138,7 +139,7 @@ showCreateListDialog: boolean = false; // New property for Create List dialog
     
     
     this.checkingTitleAvailability = false
-    const token = this.authService.getToken()
+    const token = this.authStore.token()
     const capitaliseFirstTitleLetter = this.taskTitleInput.charAt(0).toUpperCase() + this.taskTitleInput.slice(1).toLowerCase()
     const capitaliseFirstDescriptionLetter = this.taskDescriptionInput.charAt(0).toUpperCase() + this.taskDescriptionInput.slice(1).toLowerCase()
     
@@ -174,7 +175,7 @@ showCreateListDialog: boolean = false; // New property for Create List dialog
 
      saveItem(index: number,title: any, description:any){
       this.items[index].isEditing = false;
-      const taskId =this.authService.getTaskId()
+      const taskId =this.authStore.user()?.id
       this.apiService.saveTask(title,description,taskId
       ).subscribe({next:(update)=>{
       },error:(error)=>{this.handleError(error)}})

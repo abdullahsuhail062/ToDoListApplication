@@ -8,7 +8,7 @@ export class AuthStore {
   private userSignal = signal<User | null>(null);
 
   readonly token = this.tokenSignal.asReadonly();
-    readonly user = this.tokenSignal.asReadonly();
+    readonly user = this.userSignal.asReadonly();
 
 
   readonly isLoggedIn = computed(() => {

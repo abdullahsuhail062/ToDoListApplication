@@ -104,7 +104,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private refreshInterval: any;
   private weatherSubscription?: Subscription;
 
-  constructor(
+  constructor(private authStore: AuthStore,
     private readonly router: Router,
     private readonly authService: AuthService,
     private readonly apiService: ApiService,
@@ -154,7 +154,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   /* ---------------------------------- */
 
   navigateToDoList() {
-    this.router.navigate(['/ToDoList']);
+    this.router.navigate(['/toDoList']);
   }
 
   backToHome() {
@@ -200,20 +200,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
   /* ---------------------------------- */
 
   openProfileDialog() {
-    this.apiService.fetchUserProfile().subscribe({
-      next: (data) => {
         this.dialog.open(UserProfileComponent, {
           position: { top: '55px', right: '0px' },
           width: '180px',
           data: {
-            username: data.username,
-            email: data.email,
+            username: this.authStore.user()?.username,
+            email: this.authStore.user()?.email,
             onLogout: () => this.logout()
-          }
-        });
-        this.email = data.email;
+          
+          
       }
     });
+    this.email = this.authStore.user()?.email ?? null
   }
 
   openDeleteAccountDialog() {
@@ -228,7 +226,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   confirmDelete() {
     this.apiService.deleteAccount().subscribe({
       next: () => {
-        this.authService.logout()
+        this.authStore.clear()
         this.router.navigate(['/login']);
       }
     });
@@ -315,16 +313,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   toggleFavoriteState() {
-    this.apiService.toggleFavoriteIconState(this.iconState()).subscribe({
-      next: (data) => {
-        if (data.isFavorite) {
-          this.isFavorite = data.isFavorite;
+        if (this.authStore.user()?.isFavorite) {
+          this.isFavorite = this.authStore.user()?.isFavorite ?? false
         }
-      },
-      error: (error) => {
-        console.error(error.error);
-      }
-    });
+     
   }
 
   iconState(): boolean {
@@ -336,24 +328,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
   /* ---------------------------------- */
 
   greetUser() {
-    if (!this.isBrowser) return;
-    if (!localStorage.getItem('isWelcomed')) {
-      this.showWelcomeMessage = true;
-      localStorage.setItem('isWelcomed', 'true');
-    }
+   this.authService.greetUser()
+   this.showWelcomeMessage = true
   }
 
   fetchFavoriteIconState() {
-    this.apiService.fetchFavoriteIconState().subscribe({
-      next: (data) => (this.isFavorite = data?.isFavorite)
-    });
+  this.isFavorite = this.authStore.user()?.isFavorite ?? false
+    
   }
 
   fetchTaskFn() {
-    this.apiService.fetchUserProfile().subscribe({
-      next: (data) =>
-        (this.profileInitial = data.email?.charAt(0).toUpperCase() ?? '')
-    });
+    
+  this.profileInitial = this.authStore.user()?.email?.charAt(0).toUpperCase() ?? ''
+    
 
     this.sharedService.taskTriggered$.subscribe(() =>
       this.openDeleteAccountDialog()

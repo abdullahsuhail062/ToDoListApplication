@@ -1,11 +1,11 @@
 import { Interface } from "readline"
 
 export interface User {
-    userName: string;
-    email: string;
-    id: number;
+    username: string;
+    email?: string;
+    id: string;
     avatar?: string
-    isFavorite: boolean;
+    isFavorite?: boolean;
     isAdmin?: boolean;
     isVerified?: boolean;
     
