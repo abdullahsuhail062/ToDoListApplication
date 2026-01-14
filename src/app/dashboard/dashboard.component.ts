@@ -5,6 +5,7 @@ import {
   OnInit,
   OnDestroy,
   ChangeDetectorRef,
+  Inject, 
   inject,
   PLATFORM_ID
 } from '@angular/core';
@@ -14,7 +15,9 @@ import { FormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 
 
-import { MatDialog, MatDialogConfig, MatDialogModule } from '@angular/material/dialog';
+
+
+import { MAT_DIALOG_DATA, MatDialog, MatDialogConfig, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -61,6 +64,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   readonly store = inject(AuthStore)
   readonly isLoggedIn = this.store.isLoggedIn();
   readonly token = this.store.token;
+  readonly user = this.store.user()
 
   /* ---------------------------------- */
   /* UI State                           */
@@ -100,7 +104,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   /* ---------------------------------- */
   userPrompt = '';
   email: string | null = null;
-
+  dialogRef!: MatDialogRef<UserProfileComponent>
   private refreshInterval: any;
   private weatherSubscription?: Subscription;
 
@@ -113,7 +117,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private readonly clipboard: Clipboard,
     private readonly elementRef: ElementRef,
     private readonly cdr: ChangeDetectorRef,
-    title: Title
+    title: Title,
+
   ) {
     title.setTitle('User Registration App | Dashboard');
   }
@@ -145,8 +150,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
   /* ---------------------------------- */
 
   logout(): void {
-    this.authService.logout();
-    this.dialog.closeAll();
+    this.dialogRef.afterClosed().subscribe((confirmed) => {
+      if (confirmed) {
+            this.authService.logout();
+            this.router.navigate(['/login'])
+
+        
+      }
+    })
   }
 
   /* ---------------------------------- */
@@ -200,7 +211,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   /* ---------------------------------- */
 
   openProfileDialog() {
-        this.dialog.open(UserProfileComponent, {
+      this.dialogRef =  this.dialog.open(UserProfileComponent, {
           position: { top: '55px', right: '0px' },
           width: '180px',
           data: {

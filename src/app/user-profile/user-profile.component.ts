@@ -1,8 +1,9 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common'; // Needed for ngIf, etc.
 import { DeleteAccountDialogComponent } from '../delete-account-dialog/delete-account-dialog.component';
 import { SharedService } from '../shared.service'; // Keep SharedService for now
-
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+MatDialogRef
 @Component({
   selector: 'app-user-profile',
   standalone: true,
@@ -23,14 +24,15 @@ export class UserProfileComponent implements OnInit {
 
   showDeleteAccountDialog: boolean = false;
 
-  constructor(private sharedService: SharedService) {} // Keep SharedService if it's used elsewhere
+  constructor(private sharedService: SharedService,   @Inject(MAT_DIALOG_DATA) public data: any,
+    private dialogRef: MatDialogRef<UserProfileComponent>) {} // Keep SharedService if it's used elsewhere
 
   ngOnInit(): void {
     // No longer relying on MAT_DIALOG_DATA for initial values
   }
 
   logout(): void {
-    this.logoutClicked.emit();
+    this.dialogRef.close()
   }
 
   dashboard(): void {

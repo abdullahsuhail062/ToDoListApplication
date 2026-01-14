@@ -4,6 +4,7 @@ import { environmentProd } from './environments/environment.prod';
 import { weatherForecastEnvironment, weatherApiBaseUrl } from './environments/environment.prod';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from './authFiles/auth.service';
+import { LoginInterface } from './authFiles/login-Interface';
 
 
 
@@ -35,10 +36,10 @@ export class ApiService {
   }
     
 
-  registerUser(formData: any): Observable<any> {
+  registerUser(formData:any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/users/registerUser`,formData,{responseType: 'json'})
 }
-  loginUser(formData: any): Observable<any>{
+  loginUser(formData: LoginInterface): Observable<any>{
     return this.http.post(`${this.apiUrl}/users/loginUser`, formData,{responseType: 'json'})
   }
 
@@ -65,8 +66,8 @@ taskCompeletion(completed:boolean,taskTitle:string | null): Observable<any> {
   return this.http.put(`${this.apiUrl}/api/taskCompeletion`,{completed,taskTitle})
 }
 
-getTasks(token:any): Observable<any> {
-  return this.http.get(`${this.apiUrl}/api/fetchTasks`,{headers:{'authorization': `Bearer ${token}` }})
+getTasks(): Observable<any> {
+  return this.http.get(`${this.apiUrl}/api/fetchTasks`)
 }
 
 getCompletion(body: string): Observable<any> {
