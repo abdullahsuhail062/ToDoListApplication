@@ -55,6 +55,8 @@ export class LoginComponent {
          this.isLoggingIn =true
       this.apiService.loginUser(formData).subscribe({next: (data) => {
         this.authService.saveToken(data.token, data.user)
+        console.log(data.token, data.user);
+        
       this.router.navigate(['/dashboard']);
       this.isLoggingIn = false
       
