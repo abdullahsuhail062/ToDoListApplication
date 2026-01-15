@@ -57,8 +57,7 @@ showCreateListDialog: boolean = false; // New property for Create List dialog
  
  
   ngOnInit(): void {
-  const token =this.authStore.token()
-    this.apiService.getTasks(token).subscribe({next:(tasks)=>{
+    this.apiService.getTasks().subscribe({next:(tasks)=>{
     
     
       if (tasks) { 

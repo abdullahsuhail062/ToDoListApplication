@@ -51,7 +51,7 @@ import { AuthStore } from '../authFiles/auth-store';
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
-export class DashboardComponent implements OnInit, OnDestroy {
+export class DashboardComponent implements OnInit {
 
   /* ---------------------------------- */
   /* Platform / SSR                     */
@@ -73,9 +73,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   showWelcomeMessage = false;
   showShareMenu = false;
   isFavorite = false;
-  isUpdateLoading = false;
   hasDataFetched = false;
-  isCityNameCorrect = false;
 
   /* ---------------------------------- */
   /* Network / Browser                  */
@@ -85,29 +83,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
   url = encodeURIComponent('https://user-registeration-web-app-j6zm.vercel.app/dashboard');
 
   /* ---------------------------------- */
-  /* Weather                            */
-  /* ---------------------------------- */
-  city = '';
-  region = '';
-  country = '';
-  temp = '';
-  cloud = '';
-  update = '';
-  weatherCondition = '';
-  weatherIcon = '';
-  inputValue = '';
-  error = '';
-  location: any;
-
-  /* ---------------------------------- */
   /* Misc                               */
   /* ---------------------------------- */
   userPrompt = '';
   email: string | null = null;
   dialogRef!: MatDialogRef<UserProfileComponent>
-  private refreshInterval: any;
-  private weatherSubscription?: Subscription;
-
+ 
   constructor(private authStore: AuthStore,
     private readonly router: Router,
     private readonly authService: AuthService,
@@ -133,18 +114,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
       window.addEventListener('offline', () => (this.isOnline = false));
     }
 
-    this.isUpdateLoading = true;
     this.fetchFavoriteIconState();
     this.fetchTaskFn();
     this.greetUser();
-    this.initWeather();
   }
 
-  ngOnDestroy(): void {
-    if (this.refreshInterval) clearInterval(this.refreshInterval);
-    this.weatherSubscription?.unsubscribe();
-  }
-
+  
   /* ---------------------------------- */
   /* Auth Actions (STORE ONLY)           */
   /* ---------------------------------- */
@@ -241,86 +216,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.router.navigate(['/login']);
       }
     });
-  }
-
-  /* ---------------------------------- */
-  /* Weather                            */
-  /* ---------------------------------- */
-
-  initWeather() {
-    if (!this.isBrowser) return;
-
-    this.getLocationObservable().subscribe({
-      next: (loc) => {
-        this.location = loc;
-        this.fetchWeather(loc);
-        this.refreshInterval = setInterval(() => {
-          this.fetchWeather(loc);
-        }, 900000);
-      },
-      error: () => (this.isUpdateLoading = false)
-    });
-  }
-
-  fetchWeather(location: { latitude: number; longitude: number }) {
-    this.weatherSubscription = this.apiService.fetchWeatherForecast(location).subscribe({
-      next: (data) => {
-        this.hasDataFetched = true;
-        this.isUpdateLoading = false;
-        this.city = data.location.name;
-        this.region = data.location.region;
-        this.country = data.location.country;
-        this.temp = data.current.temp_c;
-        this.cloud = data.current.cloud;
-        this.weatherCondition = data.current.condition.text;
-        this.weatherIcon = data.current.condition.icon;
-        this.update = data.current.last_updated.replace(' ', ': ');
-      },
-      error: () => (this.isUpdateLoading = false)
-    });
-  }
-
-  getLocationObservable(): Observable<any> {
-    return new Observable((subscriber) => {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          subscriber.next({
-            latitude: pos.coords.latitude,
-            longitude: pos.coords.longitude
-          });
-          subscriber.complete();
-        },
-        (err) => subscriber.error(err)
-      );
-    });
-  }
-
-  search() {
-    this.fetchWeatherBySearch();
-    this.inputValue = '';
-  }
-
-  fetchWeatherBySearch() {
-    if (this.inputValue.trim().length > 0) {
-      this.apiService.fetchWeatherForecastBySearch(this.inputValue).subscribe({
-        next: (data) => {
-          this.hasDataFetched = true;
-          this.isCityNameCorrect = false;
-          this.city = data.location.name;
-          this.region = data.location.region;
-          this.country = data.location.country;
-          this.temp = data.current.temp_c;
-          this.cloud = data.current.cloud;
-          this.weatherCondition = data.current.condition.text;
-          this.weatherIcon = data.current.condition.icon;
-          this.update = data.current.last_updated.replace(' ', ': ');
-        },
-        error: (error) => {
-          this.error = 'City not found, check spelling';
-          this.isCityNameCorrect = true;
-        }
-      });
-    }
   }
 
   toggleFavoriteState() {
