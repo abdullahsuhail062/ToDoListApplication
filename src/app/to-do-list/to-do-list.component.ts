@@ -81,7 +81,7 @@ showCreateListDialog: boolean = false; // New property for Create List dialog
   
  }
 
-  openDialog(): void{ // Modified signature
+  openDialog(): void{ 
     this.showCreateListDialog = true;
   }
   
